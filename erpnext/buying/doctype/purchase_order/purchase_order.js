@@ -5,6 +5,16 @@ frappe.provide("erpnext.buying");
 
 {% include 'erpnext/public/js/controllers/buying.js' %};
 
+/*
+TODO:
+- [x] Add "Filter by Supplier" field in Supplier Quotation, Purchase Order, Invoice, Receipt
+- [ ] In `buying.js`, add logic to filter items using the selected Supplier
+	- [ ] Ignore RFQ and MREQ documents for this filter
+	- [ ] Confirm if the filter check is on before filtering
+- [ ] Contribute!
+*/
+
+
 frappe.ui.form.on("Purchase Order", {
 	setup: function(frm) {
 
@@ -43,6 +53,15 @@ frappe.ui.form.on("Purchase Order", {
 });
 
 frappe.ui.form.on("Purchase Order", "supplier", function (frm) {
+	set_custom_item_query(frm)
+});
+
+frappe.ui.form.on("Purchase Order", "filter_items_by_supplier", function (frm) {
+	set_custom_item_query(frm)
+});
+
+function set_custom_item_query(frm) {
+	debugger;
 	frm.fields_dict.items.grid.set_custom_query = function () {
 		frm.set_query("item_code", "items", function (doc) {
 			return get_supplier_items(doc);
@@ -52,10 +71,11 @@ frappe.ui.form.on("Purchase Order", "supplier", function (frm) {
 	frm.set_query("item_code", "items", function (doc) {
 		return get_supplier_items(doc);
 	});
-});
+}
 
 function get_supplier_items(doc) {
-	if (doc.supplier) {
+	debugger;
+	if (doc.supplier && doc.filter_items_by_supplier) {
 		return {
 			query: "erpnext.controllers.queries.item_supplier_query",
 			filters: {

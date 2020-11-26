@@ -650,4 +650,5 @@ def item_supplier_query(doctype, txt, searchfield, start, page_len, filters):
 		fields=["name", "item_name", "item_group", "description"],
 		as_list=True
 	)
+	
 	return supplier_items
