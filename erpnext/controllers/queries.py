@@ -634,3 +634,20 @@ def get_fields(doctype, fields=[]):
 		fields.insert(1, meta.title_field.strip())
 
 	return unique(fields)
+
+@frappe.whitelist()
+@frappe.validate_and_sanitize_search_inputs
+def item_supplier_query(doctype, txt, searchfield, start, page_len, filters):
+	supplier_item_codes = frappe.get_all('Item Supplier', 
+		filters={'supplier': filters.get('supplier')}, 
+		fields=['parent']
+	)
+
+	supplier_item_codes = [supplier.parent for supplier in supplier_item_codes]
+
+	supplier_items = frappe.get_all('Item', 
+		filters={'item_code': ['in', supplier_item_codes]},
+		fields=["name", "item_name", "item_group", "description"],
+		as_list=True
+	)
+	return supplier_items

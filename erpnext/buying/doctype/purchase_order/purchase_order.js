@@ -42,6 +42,35 @@ frappe.ui.form.on("Purchase Order", {
 	}
 });
 
+frappe.ui.form.on("Purchase Order", "supplier", function (frm) {
+	frm.fields_dict.items.grid.set_custom_query = function () {
+		frm.set_query("item_code", "items", function (doc) {
+			return get_supplier_items(doc);
+		});
+	}
+
+	frm.set_query("item_code", "items", function (doc) {
+		return get_supplier_items(doc);
+	});
+});
+
+function get_supplier_items(doc) {
+	if (doc.supplier) {
+		return {
+			query: "erpnext.controllers.queries.item_supplier_query",
+			filters: {
+				'supplier': doc.supplier
+			}
+		}
+	}
+	else {
+		return {
+			query: "erpnext.controllers.queries.item_query",
+			filters: { 'is_purchase_item': 1 }
+		}
+	}
+}
+
 frappe.ui.form.on("Purchase Order Item", {
 	schedule_date: function(frm, cdt, cdn) {
 		var row = locals[cdt][cdn];
